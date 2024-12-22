@@ -359,7 +359,8 @@
                                 <!--suppress UnresolvedMavenProperty -->
                                 <name>${env.DOCKER_USER}/${project.artifactId}:latest</name>
                                 <tags>
-                                    ghcr.io/${organization.name}/${project.artifactId}:${project.version}
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    ${env.DOCKER_USER}/${project.artifactId}:${project.version}
                                 </tags>
                                 <publish>true</publish>
                             </image>
