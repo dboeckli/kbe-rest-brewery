@@ -1,60 +1,102 @@
-# Spring Boot 6 Template Project
+# SFG Beer Works - RESTful Brewery Service
 
-## Introduction
-This project serves as a template for Spring Boot 6 applications. It provides a solid foundation for quickly starting new Spring Boot projects with pre-configured settings and best practices.
+This project is to support learning about Restful APIs.
 
-## Prerequisites
-- GitHub account
-- Git
-- JDK 21 or later
-- Maven
-- IntelliJ IDEA (recommended) or any preferred IDE
-- Docker account (for image publishing)
+You can access the API documentation [here](https://sfg-beer-works.github.io/brewery-api/#tag/Beer-Service)
 
-## Getting Started
+## Build project
 
-### 1. Project Setup
-1. In GitHub, create a new project using this template.
-2. In the new project's Settings:
-    - Enable 'Automatically delete head branches'
-    - Enable 'Always suggest updating pull request branches'
-3. Set Branch Protection Rules similar to this template project.
+with maven install a docker image is pushed to the docker repository with the image name local/kbe-rest-brewery:0.0.1-SNAPSHOT
 
-### 2. Local Development Setup
-1. Clone the newly created project.
-2. Configure Maven settings in your IDE:
-    - Point to a valid `settings.xml` for GitHub dependency resolution.
-    - Set local Maven repository outside of Microsoft's cloud (e.g., `C:\development\tools\maven-repo`).
-3. Create a feature branch for your changes.
+### Docker Commands
+#### Simple und directory docker
+Build
+``` 
+docker build  -f ./docker/Dockerfile -t kbe-rest . 
+```
+Run
+``` 
+docker run -p 8080:8080 -d kbe-rest 
+```
 
-### 3. Project Customization
-1. Search for TODOs in the project and update the following:
-    - Rename `group-id` and `artifact-id` in `pom.xml`
-    - Update `name` in `application.yaml`
-    - Ensure all names match your GitHub project name
-2. Rename packages and classes as needed.
+or without daeomon flag
 
-### 4. GitHub Configuration
-1. Add the following secrets in your GitHub project settings:
-    - `DOCKER_USER`
-    - `DOCKER_ACCESS_TOKEN`
+``` 
+docker run -p 8080:8080 kbe-rest 
+```
 
-### 5. Build and Deployment
-1. Trigger a rebuild in GitHub Actions.
-2. Upon successful build:
-    - A Docker image will be pushed to GitHub Packages and Docker Hub.
-    - Access your Docker Hub repository: https://hub.docker.com/repositories/domboeckli
-    - Change the Docker Hub image visibility from private to public to unlock it.
+check what is running
+``` 
+docker ps 
+```
+stop running container
 
-## Additional Information
-- The initial build in GitHub may fail. Follow the steps above to resolve any issues.
-- Ensure all TODOs are addressed before considering the setup complete.
-- For any issues or improvements, please create a GitHub issue in the project repository.
+``` 
+docker stop [container-id] 
+```
 
-## Contributing
-Contributions to improve this template are welcome. Please follow the standard GitHub flow:
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
+#### Layered und directory dockerLayered
+
+needs maven configuration for spring-boot-maven-plugin
+
+``` docker build  -f ./dockerLayered/Dockerfile -t kbe-rest . ```
+
+### Kubernetes Command
+
+Generate Kubernetes Deployment Yaml
+```
+kubectl create deployment kbe-rest-brewery --image=local/kbe-rest-brewery:0.0.1-SNAPSHOT --dry-run=client -o yaml > kbe-rest-brewery-deployment.yaml
+```
+
+Apply Deployment Yaml
+```
+kubectl apply -f kbe-rest-brewery-deployment.yaml
+```
+
+Check Deployment
+```
+kubectl get all
+```
+
+Generate Kubernetes Service Yaml
+```
+kubectl create service clusterip kbe-rest-brewery --tcp=8080:8080 --dry-run=client -o yaml > kbe-rest-brewery-service.yaml
+```
+
+Apply Service Yaml
+```
+kubectl apply -f kbe-rest-brewery-service.yaml
+```
+
+Check Service
+```
+kubectl get all
+```
+
+Expose Port 8080 and redirect traffic to our service in the internal network. This command is blocking. Ctl-C to terminate.
+```
+kubectl port-forward service/kbe-rest-brewery 8080:8080
+```
+Another and better approach is using the Ingress Controller. See gateway project how to do it.
+A third way is to change the service and using the NodePort (```type: NodePort``` instead of ```type: ClusterIP```)
+This expose a random port (get it with ```kubectl get all ```)
+
+Stop and Remove Service and Deployment
+```
+kubectl delete service kbe-rest-brewery
+kubectl delete deployment kbe-rest-brewery
+```
+
+Show logs
+First get the Pod Id with ```kubectl get all ```
+
+```
+kubectl logs --tail=20 kbe-rest-brewery-6bd69bf9d8-4js4j
+```
+follow logs
+```
+kubectl logs -f kbe-rest-brewery-6bd69bf9d8-4js4j
+```
+
+
+
