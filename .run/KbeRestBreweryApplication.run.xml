@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="KbeRestBreweryApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <module name="spring-6-project-template" />
+    <module name="kbe-rest-brewery" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.KbeRestBreweryApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
