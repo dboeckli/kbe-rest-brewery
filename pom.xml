@@ -42,7 +42,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 
         <logbook.version>3.11.0</logbook.version>
-        <logstash-logback.version>8.0</logstash-logback.version>
+        <logstash-logback.version>8.1</logstash-logback.version>
 
         <!-- our dependencies -->
         <spring-6-rest-mvc-api.version>0.0.1-SNAPSHOT</spring-6-rest-mvc-api.version>
