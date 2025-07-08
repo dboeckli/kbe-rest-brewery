@@ -60,7 +60,7 @@ public class BeerLoader implements CommandLineRunner {
     }
 
     private synchronized void loadBeerObjects() {
-        log.debug("Loading initial data. Count is: {}", beerRepository.count() );
+        log.info("Loading initial data. Count is: {}", beerRepository.count() );
 
         if (beerRepository.count() == 0) {
 
@@ -306,7 +306,7 @@ public class BeerLoader implements CommandLineRunner {
                     .quantityOnHand(random.nextInt(5000))
                     .build());
 
-            log.debug("Beer Records loaded: {}", beerRepository.count());
+            log.info("Beer Records loaded: {}", beerRepository.count());
         }
     }
 }
