@@ -48,7 +48,7 @@
         <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
         <merge-yaml-plugin.version>1.4</merge-yaml-plugin.version>
 
-        <logbook.version>3.12.2</logbook.version>
+        <logbook.version>3.12.3</logbook.version>
         <logstash-logback.version>8.1</logstash-logback.version>
 
         <!-- Sonar -->
