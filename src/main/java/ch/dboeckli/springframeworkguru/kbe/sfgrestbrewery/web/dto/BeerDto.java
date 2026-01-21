@@ -1,6 +1,7 @@
 package ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,8 +24,8 @@ public class BeerDto {
     @NotBlank
     private String beerName;
 
-    @NotBlank
-    private String beerStyle;
+    @NotNull
+    private BeerStyleEnum beerStyle;
 
     private String upc;
 

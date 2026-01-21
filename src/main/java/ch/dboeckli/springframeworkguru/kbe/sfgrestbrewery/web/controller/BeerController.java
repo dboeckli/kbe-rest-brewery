@@ -70,7 +70,7 @@ public class BeerController {
 
         return ResponseEntity
                 .created(UriComponentsBuilder
-                        .fromHttpUrl("http://api.springframework.guru/api/v1/beer/" + savedBeer.getId().toString())
+                        .fromUriString("http://api.springframework.guru/api/v1/beer/" + savedBeer.getId().toString())
                         .build().toUri())
                 .build();
     }
