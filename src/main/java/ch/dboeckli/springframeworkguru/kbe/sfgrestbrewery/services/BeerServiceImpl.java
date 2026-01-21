@@ -2,6 +2,7 @@ package ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.services;
 
 import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.domain.Beer;
 import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.repositories.BeerRepository;
+import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.controller.NotFoundException;
 import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.dto.BeerDto;
 import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.dto.BeerPagedList;
 import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.dto.BeerStyleEnum;
@@ -12,9 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.controller.NotFoundException;
+import org.springframework.util.ObjectUtils;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,39 +32,39 @@ public class BeerServiceImpl implements BeerService {
         BeerPagedList beerPagedList;
         Page<Beer> beerPage;
 
-        if (!StringUtils.isEmpty(beerName) && !StringUtils.isEmpty(beerStyle)) {
+        if (!ObjectUtils.isEmpty(beerName) && !ObjectUtils.isEmpty(beerStyle)) {
             //search both
             beerPage = beerRepository.findAllByBeerNameAndBeerStyle(beerName, beerStyle, pageRequest);
-        } else if (!StringUtils.isEmpty(beerName) && StringUtils.isEmpty(beerStyle)) {
+        } else if (!ObjectUtils.isEmpty(beerName) && ObjectUtils.isEmpty(beerStyle)) {
             //search beer_service name
             beerPage = beerRepository.findAllByBeerName(beerName, pageRequest);
-        } else if (StringUtils.isEmpty(beerName) && !StringUtils.isEmpty(beerStyle)) {
+        } else if (ObjectUtils.isEmpty(beerName) && !ObjectUtils.isEmpty(beerStyle)) {
             //search beer_service style
             beerPage = beerRepository.findAllByBeerStyle(beerStyle, pageRequest);
         } else {
             beerPage = beerRepository.findAll(pageRequest);
         }
 
-        if (showInventoryOnHand){
+        if (showInventoryOnHand) {
             beerPagedList = new BeerPagedList(beerPage
-                    .getContent()
-                    .stream()
-                    .map(beerMapper::beerToBeerDtoWithInventory)
-                    .collect(Collectors.toList()),
-                    PageRequest
-                            .of(beerPage.getPageable().getPageNumber(),
-                                    beerPage.getPageable().getPageSize()),
-                    beerPage.getTotalElements());
+                .getContent()
+                .stream()
+                .map(beerMapper::beerToBeerDtoWithInventory)
+                .collect(Collectors.toList()),
+                PageRequest
+                    .of(beerPage.getPageable().getPageNumber(),
+                        beerPage.getPageable().getPageSize()),
+                beerPage.getTotalElements());
         } else {
             beerPagedList = new BeerPagedList(beerPage
-                    .getContent()
-                    .stream()
-                    .map(beerMapper::beerToBeerDto)
-                    .collect(Collectors.toList()),
-                    PageRequest
-                            .of(beerPage.getPageable().getPageNumber(),
-                                    beerPage.getPageable().getPageSize()),
-                    beerPage.getTotalElements());
+                .getContent()
+                .stream()
+                .map(beerMapper::beerToBeerDto)
+                .collect(Collectors.toList()),
+                PageRequest
+                    .of(beerPage.getPageable().getPageNumber(),
+                        beerPage.getPageable().getPageSize()),
+                beerPage.getTotalElements());
         }
 
         return beerPagedList;
@@ -76,11 +75,11 @@ public class BeerServiceImpl implements BeerService {
     public BeerDto getById(UUID beerId, Boolean showInventoryOnHand) {
         if (showInventoryOnHand) {
             return beerMapper.beerToBeerDtoWithInventory(
-                    beerRepository.findById(beerId).orElseThrow(NotFoundException::new)
+                beerRepository.findById(beerId).orElseThrow(NotFoundException::new)
             );
         } else {
             return beerMapper.beerToBeerDto(
-                    beerRepository.findById(beerId).orElseThrow(NotFoundException::new)
+                beerRepository.findById(beerId).orElseThrow(NotFoundException::new)
             );
         }
     }
@@ -95,7 +94,7 @@ public class BeerServiceImpl implements BeerService {
         Beer beer = beerRepository.findById(beerId).orElseThrow(NotFoundException::new);
 
         beer.setBeerName(beerDto.getBeerName());
-        beer.setBeerStyle(BeerStyleEnum.PILSNER.valueOf(beerDto.getBeerStyle()));
+        beer.setBeerStyle(beerDto.getBeerStyle());
         beer.setPrice(beerDto.getPrice());
         beer.setUpc(beerDto.getUpc());
 

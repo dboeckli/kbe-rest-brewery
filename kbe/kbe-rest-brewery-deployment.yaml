@@ -22,8 +22,6 @@ spec:
         name: kbe-rest-brewery
         resources: {}
         env:
-          - name: LOGGING_LEVEL_ORG_ZALANDO_LOGBOOK
-            value: "TRACE"
           - name: SERVER_SHUTDOWN
             value: "graceful"
         lifecycle:

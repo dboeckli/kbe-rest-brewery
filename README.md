@@ -4,6 +4,9 @@ This project is to support learning about Restful APIs.
 
 You can access the API documentation [here](https://sfg-beer-works.github.io/brewery-api/#tag/Beer-Service)
 
+This project has been upgraded to spring boot 3.4.1 and not been tested!
+Original git repository: https://github.com/springframeworkguru/kbe-rest-brewery
+
 ## Build project
 
 with maven install a docker image is pushed to the docker repository with the image name local/kbe-rest-brewery:0.0.1-SNAPSHOT

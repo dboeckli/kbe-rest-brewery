@@ -3,34 +3,35 @@ package ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import tools.jackson.databind.JsonNode;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Created by jt on 2019-05-12.
- */
 public class BeerPagedList extends PageImpl<BeerDto> implements Serializable {
 
-    static final long serialVersionUID = 1114715135625836949L;
+    @Serial
+    private static final long serialVersionUID = 1114715135625836949L;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public BeerPagedList(@JsonProperty("content") List<BeerDto> content,
-                         @JsonProperty("number") int number,
-                         @JsonProperty("size") int size,
+                         @JsonProperty("number") Integer number,
+                         @JsonProperty("size") Integer size,
                          @JsonProperty("totalElements") Long totalElements,
                          @JsonProperty("pageable") JsonNode pageable,
-                         @JsonProperty("last") boolean last,
-                         @JsonProperty("totalPages") int totalPages,
+                         @JsonProperty("last") Boolean last,
+                         @JsonProperty("totalPages") Integer totalPages,
                          @JsonProperty("sort") JsonNode sort,
-                         @JsonProperty("first") boolean first,
-                         @JsonProperty("numberOfElements") int numberOfElements) {
+                         @JsonProperty("first") Boolean first,
+                         @JsonProperty("numberOfElements") Integer numberOfElements) {
 
-        super(content, PageRequest.of(number, size), totalElements);
+        super(content,
+            PageRequest.of(number != null ? number : 0, size != null ? size : 25),
+            totalElements != null ? totalElements : 0L);
     }
 
     public BeerPagedList(List<BeerDto> content, Pageable pageable, long total) {
@@ -38,6 +39,6 @@ public class BeerPagedList extends PageImpl<BeerDto> implements Serializable {
     }
 
     public BeerPagedList(List<BeerDto> content) {
-        super(content);
+        super(content, PageRequest.of(0, content.isEmpty() ? 1 : content.size()), content.size());
     }
 }
