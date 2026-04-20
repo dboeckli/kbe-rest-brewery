@@ -9,24 +9,20 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class CustomerServiceImpl implements CustomerService {
+
     @Override
     public CustomerDto getCustomerById(UUID customerId) {
-        return CustomerDto.builder()
-                .id(UUID.randomUUID())
-                .name("Joe Buck")
-                .build();
+        return CustomerDto.builder().id(UUID.randomUUID()).name("Joe Buck").build();
     }
 
     @Override
     public CustomerDto saveNewCustomer(CustomerDto customerDto) {
-        return CustomerDto.builder()
-                .id(UUID.randomUUID())
-                .build();
+        return CustomerDto.builder().id(UUID.randomUUID()).build();
     }
 
     @Override
     public void updateCustomer(UUID customerId, CustomerDto customerDto) {
-        //todo impl
+        // todo impl
         log.debug("Updating....");
     }
 
@@ -34,4 +30,5 @@ public class CustomerServiceImpl implements CustomerService {
     public void deleteById(UUID customerId) {
         log.debug("Deleting.... ");
     }
+
 }

@@ -14,16 +14,19 @@ import java.util.List;
 public class MvcExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<List> validationErrorHandler(ConstraintViolationException e){
+    public ResponseEntity<List> validationErrorHandler(ConstraintViolationException e) {
         List<String> errors = new ArrayList<>(e.getConstraintViolations().size());
 
-        e.getConstraintViolations().forEach(constraintViolation -> errors.add(constraintViolation.getPropertyPath() + " : " + constraintViolation.getMessage()));
+        e.getConstraintViolations()
+            .forEach(constraintViolation -> errors
+                .add(constraintViolation.getPropertyPath() + " : " + constraintViolation.getMessage()));
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BindException.class)
-    public ResponseEntity<List> handleBindException(BindException ex){
+    public ResponseEntity<List> handleBindException(BindException ex) {
         return new ResponseEntity(ex.getAllErrors(), HttpStatus.BAD_REQUEST);
     }
+
 }

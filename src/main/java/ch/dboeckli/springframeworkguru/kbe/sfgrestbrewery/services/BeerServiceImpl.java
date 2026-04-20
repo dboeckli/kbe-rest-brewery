@@ -22,49 +22,49 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BeerServiceImpl implements BeerService {
+
     private final BeerRepository beerRepository;
+
     private final BeerMapper beerMapper;
 
     @Cacheable(cacheNames = "beerListCache", condition = "#showInventoryOnHand == false ")
     @Override
-    public BeerPagedList listBeers(String beerName, BeerStyleEnum beerStyle, PageRequest pageRequest, Boolean showInventoryOnHand) {
+    public BeerPagedList listBeers(String beerName, BeerStyleEnum beerStyle, PageRequest pageRequest,
+            Boolean showInventoryOnHand) {
 
         BeerPagedList beerPagedList;
         Page<Beer> beerPage;
 
         if (!ObjectUtils.isEmpty(beerName) && !ObjectUtils.isEmpty(beerStyle)) {
-            //search both
+            // search both
             beerPage = beerRepository.findAllByBeerNameAndBeerStyle(beerName, beerStyle, pageRequest);
-        } else if (!ObjectUtils.isEmpty(beerName) && ObjectUtils.isEmpty(beerStyle)) {
-            //search beer_service name
+        }
+        else if (!ObjectUtils.isEmpty(beerName) && ObjectUtils.isEmpty(beerStyle)) {
+            // search beer_service name
             beerPage = beerRepository.findAllByBeerName(beerName, pageRequest);
-        } else if (ObjectUtils.isEmpty(beerName) && !ObjectUtils.isEmpty(beerStyle)) {
-            //search beer_service style
+        }
+        else if (ObjectUtils.isEmpty(beerName) && !ObjectUtils.isEmpty(beerStyle)) {
+            // search beer_service style
             beerPage = beerRepository.findAllByBeerStyle(beerStyle, pageRequest);
-        } else {
+        }
+        else {
             beerPage = beerRepository.findAll(pageRequest);
         }
 
         if (showInventoryOnHand) {
-            beerPagedList = new BeerPagedList(beerPage
-                .getContent()
-                .stream()
-                .map(beerMapper::beerToBeerDtoWithInventory)
-                .collect(Collectors.toList()),
-                PageRequest
-                    .of(beerPage.getPageable().getPageNumber(),
-                        beerPage.getPageable().getPageSize()),
-                beerPage.getTotalElements());
-        } else {
-            beerPagedList = new BeerPagedList(beerPage
-                .getContent()
-                .stream()
-                .map(beerMapper::beerToBeerDto)
-                .collect(Collectors.toList()),
-                PageRequest
-                    .of(beerPage.getPageable().getPageNumber(),
-                        beerPage.getPageable().getPageSize()),
-                beerPage.getTotalElements());
+            beerPagedList = new BeerPagedList(
+                    beerPage.getContent()
+                        .stream()
+                        .map(beerMapper::beerToBeerDtoWithInventory)
+                        .collect(Collectors.toList()),
+                    PageRequest.of(beerPage.getPageable().getPageNumber(), beerPage.getPageable().getPageSize()),
+                    beerPage.getTotalElements());
+        }
+        else {
+            beerPagedList = new BeerPagedList(
+                    beerPage.getContent().stream().map(beerMapper::beerToBeerDto).collect(Collectors.toList()),
+                    PageRequest.of(beerPage.getPageable().getPageNumber(), beerPage.getPageable().getPageSize()),
+                    beerPage.getTotalElements());
         }
 
         return beerPagedList;
@@ -74,13 +74,11 @@ public class BeerServiceImpl implements BeerService {
     @Override
     public BeerDto getById(UUID beerId, Boolean showInventoryOnHand) {
         if (showInventoryOnHand) {
-            return beerMapper.beerToBeerDtoWithInventory(
-                beerRepository.findById(beerId).orElseThrow(NotFoundException::new)
-            );
-        } else {
-            return beerMapper.beerToBeerDto(
-                beerRepository.findById(beerId).orElseThrow(NotFoundException::new)
-            );
+            return beerMapper
+                .beerToBeerDtoWithInventory(beerRepository.findById(beerId).orElseThrow(NotFoundException::new));
+        }
+        else {
+            return beerMapper.beerToBeerDto(beerRepository.findById(beerId).orElseThrow(NotFoundException::new));
         }
     }
 
@@ -111,4 +109,5 @@ public class BeerServiceImpl implements BeerService {
     public void deleteBeerById(UUID beerId) {
         beerRepository.deleteById(beerId);
     }
+
 }

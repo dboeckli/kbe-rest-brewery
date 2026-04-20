@@ -34,5 +34,7 @@ public class BeerDto {
     private Integer quantityOnHand;
 
     private OffsetDateTime createdDate;
+
     private OffsetDateTime lastUpdatedDate;
+
 }

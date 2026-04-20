@@ -29,21 +29,17 @@ class BeerControllerIT {
     @BeforeEach
     void setUp() {
         // Initialisierung des RestClients mit der dynamischen Port-URL
-        restClient = RestClient.builder()
-                .baseUrl("http://localhost:" + port + "/api/v1")
-                .build();
+        restClient = RestClient.builder().baseUrl("http://localhost:" + port + "/api/v1").build();
     }
 
     @Test
     void testListBeers() {
-        BeerPagedList beerPagedList = restClient.get()
-                .uri("/beer")
-                .retrieve()
-                .body(BeerPagedList.class);
+        BeerPagedList beerPagedList = restClient.get().uri("/beer").retrieve().body(BeerPagedList.class);
 
         assertThat(beerPagedList).isNotNull();
-        // Da wir nicht wissen, ob die DB leer ist, prüfen wir nur, dass die Liste existiert
-        // assertThat(beerPagedList.getContent()).isNotEmpty(); 
+        // Da wir nicht wissen, ob die DB leer ist, prüfen wir nur, dass die Liste
+        // existiert
+        // assertThat(beerPagedList.getContent()).isNotEmpty();
     }
 
     @Test
@@ -52,10 +48,7 @@ class BeerControllerIT {
         BeerDto newBeer = createBeerDto();
         BeerDto savedBeer = saveBeer(newBeer);
 
-        BeerDto foundBeer = restClient.get()
-                .uri("/beer/{beerId}", savedBeer.getId())
-                .retrieve()
-                .body(BeerDto.class);
+        BeerDto foundBeer = restClient.get().uri("/beer/{beerId}", savedBeer.getId()).retrieve().body(BeerDto.class);
 
         assertThat(foundBeer).isNotNull();
         assertThat(foundBeer.getId()).isEqualTo(savedBeer.getId());
@@ -66,11 +59,11 @@ class BeerControllerIT {
         BeerDto newBeer = createBeerDto();
 
         ResponseEntity<Void> response = restClient.post()
-                .uri("/beer")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(newBeer)
-                .retrieve()
-                .toBodilessEntity();
+            .uri("/beer")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(newBeer)
+            .retrieve()
+            .toBodilessEntity();
 
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(response.getHeaders().getLocation()).isNotNull();
@@ -82,7 +75,8 @@ class BeerControllerIT {
         BeerDto savedBeer = saveBeer(createBeerDto());
         savedBeer.setBeerName("Updated Name");
 
-        // Wir müssen die ID für den Pfad speichern, aber im Body muss sie null sein (wegen @Null Validierung)
+        // Wir müssen die ID für den Pfad speichern, aber im Body muss sie null sein
+        // (wegen @Null Validierung)
         UUID beerId = savedBeer.getId();
         savedBeer.setId(null);
 
@@ -93,13 +87,11 @@ class BeerControllerIT {
             .retrieve()
             .toBodilessEntity();
 
-        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue(); // Erwartet 204 No Content
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue(); // Erwartet 204
+                                                                         // No Content
 
         // Überprüfen, ob das Update geklappt hat
-        BeerDto updatedBeer = restClient.get()
-            .uri("/beer/{beerId}", beerId)
-            .retrieve()
-            .body(BeerDto.class);
+        BeerDto updatedBeer = restClient.get().uri("/beer/{beerId}", beerId).retrieve().body(BeerDto.class);
 
         assertThat(updatedBeer.getBeerName()).isEqualTo("Updated Name");
     }
@@ -109,47 +101,45 @@ class BeerControllerIT {
         BeerDto savedBeer = saveBeer(createBeerDto());
 
         ResponseEntity<Void> response = restClient.delete()
-                .uri("/beer/{beerId}", savedBeer.getId())
-                .retrieve()
-                .toBodilessEntity();
+            .uri("/beer/{beerId}", savedBeer.getId())
+            .retrieve()
+            .toBodilessEntity();
 
-        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue(); // Erwartet 204 No Content
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue(); // Erwartet 204
+                                                                         // No Content
 
         // Sicherstellen, dass es weg ist (Erwartet 404)
-        assertThrows(HttpClientErrorException.NotFound.class, () -> restClient.get()
-                .uri("/beer/{beerId}", savedBeer.getId())
-                .retrieve()
-                .toBodilessEntity());
+        assertThrows(HttpClientErrorException.NotFound.class,
+                () -> restClient.get().uri("/beer/{beerId}", savedBeer.getId()).retrieve().toBodilessEntity());
     }
 
     // --- Hilfsmethoden ---
 
     private BeerDto createBeerDto() {
         return BeerDto.builder()
-                .beerName("Test Beer")
-                .beerStyle(BeerStyleEnum.ALE)
-                .price(new BigDecimal("10.99"))
-                .upc("123123123")
-                .build();
+            .beerName("Test Beer")
+            .beerStyle(BeerStyleEnum.ALE)
+            .price(new BigDecimal("10.99"))
+            .upc("123123123")
+            .build();
     }
 
     private BeerDto saveBeer(BeerDto beerDto) {
         // Wir nutzen den Location Header, um die ID des neuen Bieres zu extrahieren
         ResponseEntity<Void> response = restClient.post()
-                .uri("/beer")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(beerDto)
-                .retrieve()
-                .toBodilessEntity();
-        
+            .uri("/beer")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(beerDto)
+            .retrieve()
+            .toBodilessEntity();
+
         String location = response.getHeaders().getLocation().getPath();
         String idString = location.substring(location.lastIndexOf("/") + 1);
         UUID savedId = UUID.fromString(idString);
-        
-        // Das gespeicherte Objekt abrufen (da saveNewBeer im Controller Void zurückgibt und nur den Header setzt)
-        return restClient.get()
-                .uri("/beer/{beerId}", savedId)
-                .retrieve()
-                .body(BeerDto.class);
+
+        // Das gespeicherte Objekt abrufen (da saveNewBeer im Controller Void zurückgibt
+        // und nur den Header setzt)
+        return restClient.get().uri("/beer/{beerId}", savedId).retrieve().body(BeerDto.class);
     }
+
 }
