@@ -31,10 +31,13 @@ public class Beer {
     private Long version;
 
     private String beerName;
+
     private BeerStyleEnum beerStyle;
+
     private String upc;
 
     private Integer quantityOnHand;
+
     private BigDecimal price;
 
     @CreationTimestamp
@@ -43,4 +46,5 @@ public class Beer {
 
     @UpdateTimestamp
     private Timestamp lastModifiedDate;
+
 }

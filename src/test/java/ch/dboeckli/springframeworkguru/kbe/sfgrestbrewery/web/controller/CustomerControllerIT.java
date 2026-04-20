@@ -25,9 +25,7 @@ public class CustomerControllerIT {
 
     @BeforeEach
     void setUp() {
-        restClient = RestClient.builder()
-            .baseUrl("http://localhost:" + port + "/api/v1/customer")
-            .build();
+        restClient = RestClient.builder().baseUrl("http://localhost:" + port + "/api/v1/customer").build();
     }
 
     @Test
@@ -92,19 +90,14 @@ public class CustomerControllerIT {
         // weshalb ein nachfolgender GET evtl. immer noch erfolgreich wäre.
         // Wenn die Implementierung echt wäre, würde man hier 404 erwarten:
         /*
-        assertThrows(HttpClientErrorException.NotFound.class, () -> {
-            restClient.get()
-                    .uri("/{customerId}", savedCustomer.getId())
-                    .retrieve()
-                    .toBodilessEntity();
-        });
-        */
+         * assertThrows(HttpClientErrorException.NotFound.class, () -> { restClient.get()
+         * .uri("/{customerId}", savedCustomer.getId()) .retrieve() .toBodilessEntity();
+         * });
+         */
     }
 
     private CustomerDto createCustomerDto() {
-        return CustomerDto.builder()
-            .name("Test Customer")
-            .build();
+        return CustomerDto.builder().name("Test Customer").build();
     }
 
     private CustomerDto saveCustomer(CustomerDto customerDto) {
@@ -118,10 +111,7 @@ public class CustomerControllerIT {
         String idString = location.substring(location.lastIndexOf("/") + 1);
         UUID savedId = UUID.fromString(idString);
 
-        return CustomerDto.builder()
-            .id(savedId)
-            .name(customerDto.getName())
-            .build();
+        return CustomerDto.builder().id(savedId).name(customerDto.getName()).build();
     }
 
 }
