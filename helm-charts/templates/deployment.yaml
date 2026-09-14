@@ -17,7 +17,7 @@ spec:
     spec:
       initContainers:
       containers:
-        - name: {{ .Chart.Name }}
+        - name: @project.artifactId@
           image: "{{ .Values.image.registry }}/@project.artifactId@:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:

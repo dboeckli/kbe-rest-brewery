@@ -1,3 +1,6 @@
+nameOverride: "kbe-rest-brewery"
+fullnameOverride: "kbe-rest-brewery"
+
 global:
   timezone: Europe/Zurich
   timezonePath: /etc/localtime
