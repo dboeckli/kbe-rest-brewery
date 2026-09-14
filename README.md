@@ -4,8 +4,36 @@ This project is to support learning about Restful APIs.
 
 You can access the API documentation [here](https://sfg-beer-works.github.io/brewery-api/#tag/Beer-Service)
 
-This project has been upgraded to spring boot 3.4.1 and not been tested!
+This project has been upgraded to Spring Boot 4.1.1 on Java 25.
 Original git repository: https://github.com/springframeworkguru/kbe-rest-brewery
+
+## Architecture Overview
+
+```mermaid
+graph LR
+    Client(["💻 Client"])
+
+    subgraph App ["Spring MVC App :8080"]
+        Controller["REST Controllers\n/api/v1/beer\n/api/v1/customer"]
+        Service["Services"]
+        Repository["Spring Data JPA\nRepositories"]
+        Controller --> Service
+        Service --> Repository
+    end
+
+    subgraph Databases ["Databases"]
+        H2[("H2\nIn-Memory")]
+    end
+
+    subgraph Observability ["Observability"]
+        Actuator["Actuator\n/actuator/*"]
+    end
+
+    Client <-->|"HTTP"| Controller
+    Repository <--> H2
+    Client -->|"HTTP"| Actuator
+    Actuator -->|"metrics"| Prometheus[("Prometheus")]
+```
 
 ## Sandbox (local dev environment)
 
@@ -71,12 +99,13 @@ Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
 sbx kit add <sandbox-name> "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
 ```
 
-> **Sandbox quirk:** Before any `./mvnw` in the sandbox run `export npm_config_bin_links=false`
-> (Spotless/prettier otherwise fails with EPERM on the mounted workspace).
+> **Sandbox quirk:** the sandbox kit already sets `npm_config_bin_links=false` globally, so
+> Spotless/prettier works on the mounted workspace without any manual export.
 
 ## Build project
 
-with maven install a docker image is pushed to the docker repository with the image name local/kbe-rest-brewery:0.0.1-SNAPSHOT
+`./mvnw clean install` builds the project, creates the Docker image `local/kbe-rest-brewery:development`
+(plus `local/kbe-rest-brewery:<helm.chart.version>`) and packages the Helm chart into `target/helm/repo/`.
 
 ### Docker Commands
 
@@ -190,13 +219,14 @@ kubectl logs -f kbe-rest-brewery-6bd69bf9d8-4js4j
 
 Be aware that we are using a different namespace here (not default).
 
-To run maven filtering for destination target/helm
+To run maven filtering for destination target/helm (skip the Docker image build with
+`-Dskip.docker.build=true`)
 
 ```bash
-mvn clean install -DskipTests 
+./mvnw clean install -DskipTests
 ```
 
-Go to the directory where the tgz file has been created after 'mvn install'
+Go to the directory where the tgz file has been created after `./mvnw clean install`
 
 ```powershell
 cd target/helm/repo
@@ -205,7 +235,7 @@ cd target/helm/repo
 unpack
 
 ```powershell
-$file = Get-ChildItem -Filter kbe-rest-brewery-v*.tgz | Select-Object -First 1
+$file = Get-ChildItem -Filter kbe-rest-brewery-chart-*.tgz | Select-Object -First 1
 tar -xvf $file.Name
 ```
 
