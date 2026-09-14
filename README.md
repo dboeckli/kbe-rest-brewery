@@ -26,13 +26,12 @@ graph LR
     end
 
     subgraph Observability ["Observability"]
-        Actuator["Actuator\n/actuator/*"]
+        Actuator["Actuator\n/actuator/*\n/actuator/prometheus\n(metrics scrape endpoint)"]
     end
 
     Client <-->|"HTTP"| Controller
     Repository <--> H2
     Client -->|"HTTP"| Actuator
-    Actuator -->|"metrics"| Prometheus[("Prometheus")]
 ```
 
 ## Sandbox (local dev environment)
