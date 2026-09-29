@@ -42,15 +42,15 @@ repo, starts the agent, and connects the IntelliJ MCP server.
 Allow the kit source (GitHub without cloning):
 
 ```powershell
-sbx settings set kit.allowedSources --% "[\"docker.io/\",\"github.com/dboeckli/\"]"
+sbx settings set kit.allowedSources --% "[\"docker.io/\",\"codeberg.org/dboeckli/\"]"
 ```
 
 Start a new sandbox:
 
 ```powershell
 sbx run opencode `
-    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.io/domboeckli/sbx-opencode-tooling:latest `
+    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    --template docker.cloudsmith.io/dboeckli/sbx/sbx-opencode-tooling:latest `
     --skills=off `
     --static-mcp idea `
     . `
@@ -61,8 +61,8 @@ Start the sandbox with Kubernetes support:
 
 ```powershell
 sbx run opencode `
-    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.io/domboeckli/sbx-opencode-tooling:latest `
+    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    --template docker.cloudsmith.io/dboeckli/sbx/sbx-opencode-tooling:latest `
     --skills=off `
     --static-mcp idea `
     . `
@@ -74,8 +74,8 @@ Claude variant (Home):
 
 ```powershell
 sbx run claude `
-    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.io/domboeckli/sbx-claude-tooling:latest `
+    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    --template docker.cloudsmith.io/dboeckli/sbx/sbx-claude-tooling:latest `
     --skills=off `
     --static-mcp idea `
     . `
@@ -85,7 +85,7 @@ sbx run claude `
 Mammouth (template pin lives in the spec image):
 
 ```powershell
-sbx run "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=mammouth-agent" `
+sbx run "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=mammouth-agent" `
     --kit-arg imageTag=latest `
     --skills=off `
     --static-mcp idea `
@@ -96,7 +96,7 @@ sbx run "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=mammouth-a
 Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
 
 ```powershell
-sbx kit add opencode-kbe-rest-brewery "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
+sbx kit add opencode-kbe-rest-brewery "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
 ```
 
 > **Sandbox quirk:** the sandbox kit already sets `npm_config_bin_links=false` globally, so
