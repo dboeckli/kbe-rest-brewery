@@ -69,9 +69,8 @@ public class CustomerControllerIT {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        // Da die Update-Methode im Service aktuell nur ein TODO ist (laut Kontext),
-        // können wir hier noch nicht prüfen, ob der Name wirklich geändert wurde,
-        // es sei denn, du hast die Implementierung im Service inzwischen ergänzt.
+        // Die Update-Methode im Service ist noch nicht implementiert, daher kann hier
+        // nicht geprüft werden, ob der Name tatsächlich geändert wurde.
     }
 
     @Test
@@ -84,16 +83,6 @@ public class CustomerControllerIT {
             .toBodilessEntity();
 
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-
-        // Hinweis: Da die Delete-Methode im Service auch nur ein Log-Statement ist,
-        // wird der Customer vermutlich nicht wirklich gelöscht sein,
-        // weshalb ein nachfolgender GET evtl. immer noch erfolgreich wäre.
-        // Wenn die Implementierung echt wäre, würde man hier 404 erwarten:
-        /*
-         * assertThrows(HttpClientErrorException.NotFound.class, () -> { restClient.get()
-         * .uri("/{customerId}", savedCustomer.getId()) .retrieve() .toBodilessEntity();
-         * });
-         */
     }
 
     private CustomerDto createCustomerDto() {

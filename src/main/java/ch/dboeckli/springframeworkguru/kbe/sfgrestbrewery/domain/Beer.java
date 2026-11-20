@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-@Data // TODO: DANGEROUS
+@Data // DANGEROUS: exposes mutable setters for all fields
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

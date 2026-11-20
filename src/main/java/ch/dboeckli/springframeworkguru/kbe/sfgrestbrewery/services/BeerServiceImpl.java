@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,18 +50,14 @@ public class BeerServiceImpl implements BeerService {
             beerPage = beerRepository.findAll(pageRequest);
         }
 
-        if (showInventoryOnHand) {
+        if (Boolean.TRUE.equals(showInventoryOnHand)) {
             beerPagedList = new BeerPagedList(
-                    beerPage.getContent()
-                        .stream()
-                        .map(beerMapper::beerToBeerDtoWithInventory)
-                        .collect(Collectors.toList()),
+                    beerPage.getContent().stream().map(beerMapper::beerToBeerDtoWithInventory).toList(),
                     PageRequest.of(beerPage.getPageable().getPageNumber(), beerPage.getPageable().getPageSize()),
                     beerPage.getTotalElements());
         }
         else {
-            beerPagedList = new BeerPagedList(
-                    beerPage.getContent().stream().map(beerMapper::beerToBeerDto).collect(Collectors.toList()),
+            beerPagedList = new BeerPagedList(beerPage.getContent().stream().map(beerMapper::beerToBeerDto).toList(),
                     PageRequest.of(beerPage.getPageable().getPageNumber(), beerPage.getPageable().getPageSize()),
                     beerPage.getTotalElements());
         }
@@ -73,7 +68,7 @@ public class BeerServiceImpl implements BeerService {
     @Cacheable(cacheNames = "beerCache", key = "#beerId", condition = "#showInventoryOnHand == false ")
     @Override
     public BeerDto getById(UUID beerId, Boolean showInventoryOnHand) {
-        if (showInventoryOnHand) {
+        if (Boolean.TRUE.equals(showInventoryOnHand)) {
             return beerMapper
                 .beerToBeerDtoWithInventory(beerRepository.findById(beerId).orElseThrow(NotFoundException::new));
         }

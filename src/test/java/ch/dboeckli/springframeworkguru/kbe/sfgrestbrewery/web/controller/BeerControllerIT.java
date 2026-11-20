@@ -1,5 +1,6 @@
 package ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.controller;
 
+import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.bootstrap.BeerLoader;
 import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.dto.BeerDto;
 import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.dto.BeerPagedList;
 import ch.dboeckli.springframeworkguru.kbe.sfgrestbrewery.web.dto.BeerStyleEnum;
@@ -37,9 +38,41 @@ class BeerControllerIT {
         BeerPagedList beerPagedList = restClient.get().uri("/beer").retrieve().body(BeerPagedList.class);
 
         assertThat(beerPagedList).isNotNull();
-        // Da wir nicht wissen, ob die DB leer ist, prüfen wir nur, dass die Liste
-        // existiert
-        // assertThat(beerPagedList.getContent()).isNotEmpty();
+    }
+
+    @Test
+    void testListBeersWithInventoryAndPagination() {
+        BeerPagedList beerPagedList = restClient.get()
+            .uri("/beer?pageNumber=0&pageSize=5&showInventoryOnHand=true")
+            .retrieve()
+            .body(BeerPagedList.class);
+
+        assertThat(beerPagedList).isNotNull();
+        assertThat(beerPagedList.getSize()).isEqualTo(5);
+        assertThat(beerPagedList.getContent()).isNotEmpty();
+    }
+
+    @Test
+    void testListBeersFallsBackToDefaultsForInvalidPagination() {
+        BeerPagedList beerPagedList = restClient.get()
+            .uri("/beer?pageNumber=-1&pageSize=0&showInventoryOnHand=false")
+            .retrieve()
+            .body(BeerPagedList.class);
+
+        assertThat(beerPagedList).isNotNull();
+        assertThat(beerPagedList.getNumber()).isZero();
+        assertThat(beerPagedList.getSize()).isEqualTo(25);
+    }
+
+    @Test
+    void testGetBeerByUpc() {
+        BeerDto foundBeer = restClient.get()
+            .uri("/beerUpc/{upc}", BeerLoader.BEER_1_UPC)
+            .retrieve()
+            .body(BeerDto.class);
+
+        assertThat(foundBeer).isNotNull();
+        assertThat(foundBeer.getUpc()).isEqualTo(BeerLoader.BEER_1_UPC);
     }
 
     @Test
@@ -52,6 +85,14 @@ class BeerControllerIT {
 
         assertThat(foundBeer).isNotNull();
         assertThat(foundBeer.getId()).isEqualTo(savedBeer.getId());
+
+        BeerDto beerWithInventory = restClient.get()
+            .uri("/beer/{beerId}?showInventoryOnHand=true", savedBeer.getId())
+            .retrieve()
+            .body(BeerDto.class);
+
+        assertThat(beerWithInventory).isNotNull();
+        assertThat(beerWithInventory.getId()).isEqualTo(savedBeer.getId());
     }
 
     @Test

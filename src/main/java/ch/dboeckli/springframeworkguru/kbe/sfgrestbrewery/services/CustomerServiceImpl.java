@@ -22,7 +22,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateCustomer(UUID customerId, CustomerDto customerDto) {
-        // todo impl
         log.debug("Updating....");
     }
 
