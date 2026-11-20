@@ -38,9 +38,6 @@ class BeerControllerIT {
         BeerPagedList beerPagedList = restClient.get().uri("/beer").retrieve().body(BeerPagedList.class);
 
         assertThat(beerPagedList).isNotNull();
-        // Da wir nicht wissen, ob die DB leer ist, prüfen wir nur, dass die Liste
-        // existiert
-        // assertThat(beerPagedList.getContent()).isNotEmpty();
     }
 
     @Test
