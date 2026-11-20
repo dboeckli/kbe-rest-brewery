@@ -1,0 +1,45 @@
+# Flow: createCustomer -> editCustomer — see restRequest/customer-flow-create-edit/customer-flow-create-edit.md
+
+### 1) create a customer (sets {{customerId}} from the Location header)
+< ../scripts/traceparent.js
+POST http://localhost:{{application-port}}/api/v1/customer
+Accept: application/json
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+{
+  "name": "customer-flow"
+}
+
+> {%
+    const location = response.headers.valueOf("Location");
+    const customerId = location.substring(location.lastIndexOf("/") + 1);
+    client.global.set("customerId", customerId);
+    client.log("Created customer id: " + customerId);
+
+    client.test("createCustomer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("Location header contains a customer id", function () {
+        client.assert(!!customerId, "customerId missing in Location header");
+    });
+%}
+
+### 2) edit the created customer (uses {{customerId}})
+< ../scripts/traceparent.js
+PUT http://localhost:{{application-port}}/api/v1/customer/{{customerId}}
+Accept: application/json
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+{
+  "name": "customer-flow-edited"
+}
+
+> {%
+    client.test("editCustomer returns 204", function () {
+        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    });
+%}

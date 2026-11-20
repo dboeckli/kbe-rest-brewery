@@ -1,0 +1,104 @@
+# Flow: listBeers -> createBeer -> getBeerById -> getBeerByUpc -> deleteBeer — see restRequest/beer-flow-list-get-delete/beer-flow-list-get-delete.md
+
+### 1) list beers (smoke-checks the list endpoint)
+< ../scripts/traceparent.js
+GET http://localhost:{{application-port}}/api/v1/beer?pageNumber=0&pageSize=5
+Accept: application/json
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+> {%
+    client.log("listBeers -> " + response.body.content.length + " beer(s) on first page");
+    client.test("listBeers returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
+
+### 2) create a dedicated beer for the delete flow (sets {{beerId}})
+< ../scripts/traceparent.js
+POST http://localhost:{{application-port}}/api/v1/beer
+Accept: application/json
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+{
+  "beerName": "delete-flow-beer",
+  "beerStyle": "LAGER",
+  "upc": "delete-flow",
+  "quantityOnHand": 1,
+  "price": 1.00
+}
+
+> {%
+    const location = response.headers.valueOf("Location");
+    const beerId = location.substring(location.lastIndexOf("/") + 1);
+    client.global.set("beerId", beerId);
+    client.log("Created beer id: " + beerId);
+
+    client.test("createBeer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("Location header contains a beer id", function () {
+        client.assert(!!beerId, "beerId missing in Location header");
+    });
+%}
+
+### 3) get the created beer by id
+< ../scripts/traceparent.js
+GET http://localhost:{{application-port}}/api/v1/beer/{{beerId}}
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+> {%
+    client.test("getBeerById returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("returned beer id matches", function () {
+        client.assert(response.body.id === client.global.get("beerId"), "beerId mismatch");
+    });
+%}
+
+### 4) get the created beer by upc
+< ../scripts/traceparent.js
+GET http://localhost:{{application-port}}/api/v1/beerUpc/delete-flow
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+> {%
+    client.test("getBeerByUpc returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("returned beer upc matches", function () {
+        client.assert(response.body.upc === "delete-flow", "upc mismatch");
+    });
+%}
+
+### 5) delete the created beer by id
+< ../scripts/traceparent.js
+DELETE http://localhost:{{application-port}}/api/v1/beer/{{beerId}}
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+> {%
+    client.test("deleteBeer returns 204", function () {
+        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    });
+%}
+
+### 6) get the deleted beer by id (expects 404)
+< ../scripts/traceparent.js
+GET http://localhost:{{application-port}}/api/v1/beer/{{beerId}}
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+> {%
+    client.test("getBeerById returns 404 after delete", function () {
+        client.assert(response.status === 404, "expected 404 but got " + response.status);
+    });
+%}
