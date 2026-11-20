@@ -1,0 +1,53 @@
+# Flow: createBeer -> editBeer — see restRequest/beer-flow-create-edit/beer-flow-create-edit.md
+
+### 1) create a beer (sets {{beerId}} from the Location header)
+< ../scripts/traceparent.js
+POST http://localhost:{{application-port}}/api/v1/beer
+Accept: application/json
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+{
+  "beerName": "presidente",
+  "beerStyle": "LAGER",
+  "upc": "create-edit-flow",
+  "quantityOnHand": 5,
+  "price": 27.16
+}
+
+> {%
+    const location = response.headers.valueOf("Location");
+    const beerId = location.substring(location.lastIndexOf("/") + 1);
+    client.global.set("beerId", beerId);
+    client.log("Created beer id: " + beerId);
+
+    client.test("createBeer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("Location header contains a beer id", function () {
+        client.assert(!!beerId, "beerId missing in Location header");
+    });
+%}
+
+### 2) edit the created beer (uses {{beerId}})
+< ../scripts/traceparent.js
+PUT http://localhost:{{application-port}}/api/v1/beer/{{beerId}}
+Accept: application/json
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+{
+  "beerName": "presidente-edited",
+  "beerStyle": "PALE_ALE",
+  "upc": "create-edit-flow-edited",
+  "quantityOnHand": 7,
+  "price": 28.50
+}
+
+> {%
+    client.test("editBeer returns 204", function () {
+        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    });
+%}

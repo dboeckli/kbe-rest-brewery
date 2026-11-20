@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Bruno ###
+node_modules/
+bru-reports/

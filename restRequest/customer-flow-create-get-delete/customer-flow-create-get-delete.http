@@ -1,0 +1,57 @@
+# Flow: createCustomer -> getCustomerById -> deleteCustomer — see restRequest/customer-flow-create-get-delete/customer-flow-create-get-delete.md
+
+### 1) create a customer (sets {{customerId}} from the Location header)
+< ../scripts/traceparent.js
+POST http://localhost:{{application-port}}/api/v1/customer
+Accept: application/json
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+{
+  "name": "customer-delete-flow"
+}
+
+> {%
+    const location = response.headers.valueOf("Location");
+    const customerId = location.substring(location.lastIndexOf("/") + 1);
+    client.global.set("customerId", customerId);
+    client.log("Created customer id: " + customerId);
+
+    client.test("createCustomer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("Location header contains a customer id", function () {
+        client.assert(!!customerId, "customerId missing in Location header");
+    });
+%}
+
+### 2) get the created customer by id
+< ../scripts/traceparent.js
+GET http://localhost:{{application-port}}/api/v1/customer/{{customerId}}
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+> {%
+    client.log("getCustomerById -> " + client.global.get("customerId"));
+    client.test("getCustomerById returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("getCustomerById returns a body", function () {
+        client.assert(!!response.body, "response body missing");
+    });
+%}
+
+### 3) delete the created customer by id
+< ../scripts/traceparent.js
+DELETE http://localhost:{{application-port}}/api/v1/customer/{{customerId}}
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=kbe-rest-brewery
+
+> {%
+    client.test("deleteCustomer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
