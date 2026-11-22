@@ -597,16 +597,6 @@
               <artifactId>lombok</artifactId>
             </exclude>
           </excludes>
-          <image>
-            <env>
-              <!-- WORKAROUND for #109 (https://github.com/dboeckli/kbe-rest-brewery/issues/109):
-                   Paketo still contributes spring-cloud-bindings 2.0.4 for Boot 4.x, which uses the
-                   removed org.springframework.boot.env.EnvironmentPostProcessor and crashes at startup.
-                   Remove once https://github.com/spring-cloud/spring-cloud-bindings/issues/116 is fixed
-                   and shipped by the Paketo spring-boot buildpack. -->
-              <BP_SPRING_CLOUD_BINDINGS_DISABLED>true</BP_SPRING_CLOUD_BINDINGS_DISABLED>
-            </env>
-          </image>
         </configuration>
 
         <executions>
